@@ -9,6 +9,7 @@ EFont[] fonts;        // contains all fonts
 String[] fontNames;   // names of fonts, is used to build fonts[]
 
 boolean showDate;     // show the date?
+boolean showRGBValues;// show the RGB values?
 
 float spacing;        // spacing between the characters HH : MM : SS
 int fontSize;         // size of font
@@ -54,21 +55,19 @@ void setup(){
   fontCooldownMax = 15;
   
   showDate = true;
-  
-  
+  showRGBValues = true;
+    
   // horizontal spacing between hours and minutes and seconds
   // can be changed with +-.,
   spacing = 3;
   
   mode = "light";
   
-  // load previous session if it exists
-  loadSessionData();
-  
   textFont(fonts[0].getFont());
   
-  
-  //printArray(PFont.list());
+  // load previous session if it exists
+  // overrides default settings
+  loadSessionData();
   
 }
 
@@ -87,6 +86,7 @@ void keyPressed(){
   if (key == '.') spacing /= 1.03;   // spacing small adjust +
   if (key == ',') spacing *= 1.03;   // spacing small adjust -
   
+  if (key == 'a') showRGBValues = !showRGBValues;  // toggle show RGB values
   if (key == 'd') showDate = !showDate;  // toggle show date
   
   // increase font size
@@ -188,7 +188,7 @@ void draw(){
   // Date
   if(showDate){
     
-    float endOfTime = textWidth(seconds);
+    float secondStringLength = textWidth(seconds);
     textAlign(RIGHT);
     
     String day   = str(day());
@@ -201,8 +201,40 @@ void draw(){
     String dateString = day + "." + month + "." + year;
     
     textSize(fontSize/1.9);
-    text(dateString, ((width / 2) + segment + endOfTime/2) + xAdjust, (height/2 + fontSize) + yAdjust);
+    text(dateString, ((width / 2) + segment + secondStringLength/2) + xAdjust, (height/2 + fontSize) + yAdjust);
     
+  }
+  
+  // RGB Values
+  if(showRGBValues){
+    
+    textSize(fontSize);
+    float hourStringLength = textWidth(hours);
+    
+    textSize(fontSize/1.9);
+    float spaceStringLength = textWidth(" ");
+    textAlign(LEFT);
+    
+    String sRed   = str(int(red));
+    String sBlue  = str(int(blue));
+    String sGreen = str(int(green));
+    
+    while(sRed.length()   < 3) sRed = "0" + sRed;
+    while(sBlue.length()  < 3) sBlue = "0" + sBlue;
+    while(sGreen.length() < 3) sGreen = "0" + sGreen;
+    
+    float   sRedLength = textWidth(sRed);
+    float  sBlueLength = textWidth(sBlue);
+    float sGreenLength = textWidth(sGreen);
+    
+    fill(red, 0, 0);
+    text(sRed,   ((width / 2) - segment - hourStringLength/2) + xAdjust, (height/2 + fontSize) + yAdjust);
+    
+    fill(0, green, 0);
+    text(sGreen, ((width / 2) - segment - hourStringLength/2) + xAdjust + sRedLength, (height/2 + fontSize) + yAdjust);
+    
+    fill(0, 0, blue);
+    text(sBlue,  ((width / 2) - segment - hourStringLength/2) + xAdjust + sRedLength + sBlueLength, (height/2 + fontSize) + yAdjust);
     
   }
   
@@ -214,7 +246,7 @@ void surfaceResized() {
 
 public void saveSessionData(){
   
-  String[] dataToSave = new String[8];
+  String[] dataToSave = new String[10];
   
   dataToSave[0] = str(fontCounter);
   dataToSave[1] = str(fontSize);
@@ -224,6 +256,8 @@ public void saveSessionData(){
   dataToSave[5] = str(height);
   dataToSave[6] = str(xAdjust);
   dataToSave[7] = str(yAdjust);
+  dataToSave[8] = str(showDate);
+  dataToSave[9] = str(showRGBValues);
   
   saveStrings("settings.txt", dataToSave);
   
@@ -248,6 +282,9 @@ public boolean loadSessionData(){
     
     xAdjust = int(loadedData[6]);
     yAdjust = int(loadedData[7]);
+    
+    showDate = boolean(loadedData[8]);
+    showRGBValues = boolean(loadedData[9]);
     
     fonts[fontCounter].setSize(fontSize);
     surface.setSize(new_width, new_height);
