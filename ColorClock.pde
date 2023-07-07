@@ -10,6 +10,7 @@ String[] fontNames;   // names of fonts, is used to build fonts[]
 
 boolean showDate;     // show the date?
 boolean showRGBValues;// show the RGB values?
+boolean showTimer;    // show the timer?
 
 float spacing;        // spacing between the characters HH : MM : SS
 int fontSize;         // size of font
@@ -18,13 +19,19 @@ float yAdjust;        // adjust y position
 
 String mode;          // "light" or "dark" for light or darkmode
 
+Timer timer;          // the timer that gets displayed when showTimer is true
+PImage timerIconWhite, timerIconBlack;
 
 void setup(){
  
+  // window settings
   size(600, 200);
   surface.setTitle("ColorClock");
+  surface.setResizable(true); 
   
-  fontSize = 80;  // starting font size
+  // font settings
+  // you can get a list of possible fonts with Pfont.list()
+  fontSize = 80;
   fontNames = new String[]{
     
     "Courier New Bold",
@@ -32,28 +39,32 @@ void setup(){
     "Lucida Console",
     "Rockwell",
     "Consolas",
-    "Comic Sans MS Bold"
+    "Comic Sans MS Bold" // best font
     
   };
   
   maxFonts = fontNames.length;
   
+  // create fonts from fontNames list
+  // add the fontname to fontNames to add a font
   fonts = new EFont[maxFonts];
-  
   for (int i = 0; i < maxFonts; i++){
     
+    // create an EFont and save it in the fonts[] array
     String currentFontName = fontNames[i];
-    
     fonts[i] = new EFont(currentFontName, fontSize);
     
     
   }
   
-  surface.setResizable(true); 
-  
+  // position in the fonts[] array
   fontCounter = 0;
+  
+  // how many frames between allowing the darkmode/lightmode switch
+  // 15 at 30 fps -> half a second
   fontCooldownMax = 15;
   
+  showTimer = false;
   showDate = true;
   showRGBValues = true;
     
@@ -61,8 +72,15 @@ void setup(){
   // can be changed with +-.,
   spacing = 3;
   
+  // light mode by default
+  // please dont hate me
   mode = "light";
   
+  // load the timer icons
+  timerIconBlack = loadImage("timerBlack.png");
+  timerIconWhite = loadImage("timerWhite.png");
+  
+  // set the current font to the first font in fonts[]
   textFont(fonts[0].getFont());
   
   // load previous session if it exists
@@ -118,6 +136,17 @@ void keyPressed(){
     if(keyCode == DOWN)   yAdjust += 1;
     if(keyCode == LEFT)   xAdjust -= 1;
     if(keyCode == RIGHT)  xAdjust += 1;
+    
+  }
+  
+  // start the timer
+  if(key == 't' || key == 'T'){
+    
+    // switch between showing and hiding the timer
+    showTimer = !showTimer;
+    
+    if (showTimer) timer = new Timer();
+    else           timer = null;
     
   }
   
@@ -235,6 +264,45 @@ void draw(){
     
     fill(0, 0, blue);
     text(sBlue,  ((width / 2) - segment - hourStringLength/2) + xAdjust + sRedLength + sBlueLength, (height/2 + fontSize) + yAdjust);
+    
+  }
+  
+  if(showTimer){
+    
+    fill(240, 70);
+
+    textSize(fontSize/2);  // assuming half of the original font size for start time and passed time
+    textAlign(LEFT, TOP);  // align to the top-left corner
+    
+    String startTime = timer.getStartTime();
+    String passedTime = timer.getPassedTime();
+    
+    float  startTimeLength = textWidth(startTime);
+    float passedTimeLength = textWidth(passedTime);
+    
+    text(startTime, ((width / 2) - segment - startTimeLength/4) + xAdjust, (height/2 - fontSize) + yAdjust);  // Positioning above the start time
+    
+    fill(250);
+    
+    textAlign(RIGHT, TOP);
+    text(passedTime, ((width / 2) + segment + passedTimeLength/4) + xAdjust, (height/2 - fontSize) + yAdjust);  // Positioning above the passed time
+    
+    // draw a white border
+    fill(240, 70);
+    stroke(0, 0);
+    float borderSize = (width + height) / 75.;
+    
+    rect(0, 0, width, borderSize);      // top border
+    rect(width - borderSize, borderSize, borderSize, height - borderSize);      // right border
+    rect(borderSize, height - borderSize, width - borderSize * 2, borderSize);      // bottom border
+    rect(0, borderSize, borderSize, height - borderSize);      // left border 
+    
+    // show a timer icon
+    // icon by aepul Nahwan
+    // https://www.flaticon.com/free-icon/timer_10994506
+    float iconSize = fontSize / 1.9;
+    
+    image(timerIconWhite, width/2 - iconSize / 2, (height/2 - fontSize) + yAdjust, iconSize, iconSize);
     
   }
   
