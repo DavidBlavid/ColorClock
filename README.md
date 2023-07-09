@@ -1,5 +1,5 @@
 # ColorClock
-A simple implementation of a RGB clock in Processing.
+A simple implementation of an RGB clock in Processing.
 
 ![Colorclock](https://github.com/DavidBlavid/ColorClock/assets/63608955/50257b43-d5bf-4402-b9c7-d465020f3cfb)
 
