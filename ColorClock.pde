@@ -302,7 +302,7 @@ void draw(){
     // https://www.flaticon.com/free-icon/timer_10994506
     float iconSize = fontSize / 1.9;
     
-    image(timerIconWhite, width/2 - iconSize / 2, (height/2 - fontSize) + yAdjust, iconSize, iconSize);
+    image(timerIconWhite, (width/2 - iconSize / 2) + xAdjust, (height/2 - fontSize) + yAdjust, iconSize, iconSize);
     
   }
   
