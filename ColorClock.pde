@@ -298,7 +298,7 @@ void draw(){
     rect(0, borderSize, borderSize, height - borderSize);      // left border 
     
     // show a timer icon
-    // icon by aepul Nahwan
+    // Icon by Saepul Nahwan
     // https://www.flaticon.com/free-icon/timer_10994506
     float iconSize = fontSize / 1.9;
     
